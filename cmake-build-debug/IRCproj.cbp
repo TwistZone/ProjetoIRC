@@ -161,13 +161,13 @@
 		<Unit filename="/home/francisco/Desktop/ProjetoIRC/client.c">
 			<Option target="Client"/>
 		</Unit>
-		<Unit filename="/home/francisco/Desktop/ProjetoIRC/headers.h">
-			<Option target="Server"/>
-		</Unit>
 		<Unit filename="/home/francisco/Desktop/ProjetoIRC/proxy.c">
 			<Option target="Proxy"/>
 		</Unit>
 		<Unit filename="/home/francisco/Desktop/ProjetoIRC/server.c">
+			<Option target="Server"/>
+		</Unit>
+		<Unit filename="/home/francisco/Desktop/ProjetoIRC/server_headers.h">
 			<Option target="Server"/>
 		</Unit>
 		<Unit filename="/home/francisco/Desktop/ProjetoIRC/CMakeLists.txt">

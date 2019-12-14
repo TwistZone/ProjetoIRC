@@ -13,7 +13,7 @@
 #include <dirent.h>
 #include <regex.h>
 #include <ctype.h>
-#include "headers.h"
+#include "server_headers.h"
 
 #define BUF_SIZE 1024
 #define DOWNLOAD_PATTERN "download (tcp|udp) (enc|nor) [a-zA-Z.]*"

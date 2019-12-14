@@ -2,8 +2,8 @@
 // Created by francisco on 14/12/2019.
 //
 
-#ifndef IRCPROJ_HEADERS_H
-#define IRCPROJ_HEADERS_H
+#ifndef IRCPROJ_SERVER_HEADERS_H
+#define IRCPROJ_SERVER_HEADERS_H
 
 void *process_client(void *arg);
 
@@ -17,4 +17,4 @@ void to_lower(char *str);
 
 void upload(FILE *fp, int client_fd, char *file_name);
 
-#endif //IRCPROJ_HEADERS_H
+#endif //IRCPROJ_SERVER_HEADERS_H

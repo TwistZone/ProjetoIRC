@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/francisco/Desktop/ProjetoIRC/proxy.c
+sys/socket.h
+-
+sys/types.h
+-
+resolv.h
+-
+string.h
+-
+stdlib.h
+-
+pthread.h
+-
+unistd.h
+-
+netdb.h
+-
+arpa/inet.h
+-
+
