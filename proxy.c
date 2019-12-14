@@ -10,7 +10,7 @@
  #include<unistd.h>  
  #include<netdb.h> //hostent  
  #include<arpa/inet.h>  
-
+ int server_fd,proxy_fd;
  int hostname_to_ip(char * , char *);  
  // A structure to maintain client fd, and server ip address and port address  
  // client will establish connection to server using given IP and port   
@@ -25,32 +25,13 @@
  void *runSocket(void *vargp)  
  {  
    struct serverInfo *info = (struct serverInfo *)vargp;  
+   
    char buffer[65535];  
    int bytes =0;  
       printf("client:%d\n",info->client_fd);  
       fputs(info->ip,stdout);  
       fputs(info->port,stdout);  
-      //code to connect to main server via this proxy server  
-      int server_fd =0;  
-      struct sockaddr_in server_sd;  
-      // create a socket  
-      server_fd = socket(AF_INET, SOCK_STREAM, 0);  
-      if(server_fd < 0)  
-      {  
-           printf("server socket not created\n");  
-      }  
-      printf(" server socket created\n");       
-      memset(&server_sd, 0, sizeof(server_sd));  
-      // set socket variables  
-      server_sd.sin_family = AF_INET;  
-      server_sd.sin_port = htons(atoi(info->port));  
-      server_sd.sin_addr.s_addr = inet_addr(info->ip);  
-      //connect to main server from this proxy server  
-      if((connect(server_fd, (struct sockaddr *)&server_sd, sizeof(server_sd)))<0)  
-      {  
-           printf("server connection not established\n");  
-      }  
-      printf("server socket connected\n");  
+    
       while(1)  
       {  
            //receive data from client  
@@ -97,8 +78,63 @@
         strcpy(proxy_port,argv[3]); // proxy port  
         //hostname_to_ip(hostname , ip);  
         printf("server IP : %s and port %s\n" , ip,port);   
-        printf("proxy port is %s",proxy_port);        
-        printf("\n");  
+        printf("proxy port is %s\n",proxy_port);         
+
+
+
+ //code to connect to main server via this proxy server  
+      struct sockaddr_in server_sd;  
+      // create a socket  
+      server_fd = socket(AF_INET, SOCK_STREAM, 0);   
+        // set socket variables 
+
+      server_sd.sin_family = AF_INET;  
+      server_sd.sin_port = atoi(port);
+      server_sd.sin_addr.s_addr = atoi(ip);
+      if(server_fd < 0)  
+      {  
+           printf("server socket not created\n");  
+      }  
+      printf(" server socket created\n");       
+      memset(&server_sd, 0, sizeof(server_sd));  
+     
+      //connect to main server from this proxy server 
+      for(int i=1;i<11;i++) { 
+           printf("Trying to connect...\n"); 
+           printf("Try number %d\n",i);
+      if((connect(server_fd, (struct sockaddr *)&server_sd, sizeof(server_sd)))<=0)  
+      {  
+           printf("server connection not established\n");  
+      }  
+      
+      sleep(2);
+      if(i==9 && (connect(server_fd, (struct sockaddr *)&server_sd, sizeof(server_sd))) == 0){
+           printf("Connection failed!");
+           exit(1);
+      }
+}
+     printf("Connected!");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       //socket variables  
       int proxy_fd =0, client_fd=0;  
       struct sockaddr_in proxy_sd;  
@@ -134,7 +170,7 @@
            if(client_fd > 0)  
            {  
                  //multithreading variables      
-                 struct serverInfo *item = malloc(sizeof(struct serverInfo));  
+                 struct serverInfo *item = malloc(sizeof(struct serverInfo));   
                  item->client_fd = client_fd;  
                  strcpy(item->ip,ip);  
                  strcpy(item->port,port);  
