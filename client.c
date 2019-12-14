@@ -7,11 +7,15 @@
 #include <unistd.h>
 #include <netdb.h>
 
+#define BUF_SIZE 1000
+
 void erro(char *msg);
 
 int main(int argc, char *argv[]) {
-    char endServer[100];
+    char endServer[BUF_SIZE];
+    char buffer[BUF_SIZE];
     int fd;
+    int fim = 0, n_read;
     struct sockaddr_in addr;
     struct hostent *hostPtr;
 
@@ -28,16 +32,25 @@ int main(int argc, char *argv[]) {
     //sets up required struct to connect to server
     bzero((void *) &addr, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = ((struct in_addr *)(hostPtr->h_addr))->s_addr;
+    addr.sin_addr.s_addr = ((struct in_addr *) (hostPtr->h_addr))->s_addr;
     addr.sin_port = htons((short) atoi(argv[4]));
 
     //sets up socket and tries connection
-    if((fd = socket(AF_INET,SOCK_STREAM,0)) == -1)
+    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         erro("socket");
-    if( connect(fd,(struct sockaddr *)&addr,sizeof (addr)) < 0)
+    if (connect(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0)
         erro("Connect");
-
-    write(fd, "Hello World!", sizeof("Hello World!"));
+    while (!fim) {
+        //get user input and send to server
+        fgets(buffer, BUF_SIZE, stdin);
+        //in case of exit end cycle
+        if (!strcasecmp(buffer, "exit")) {
+            fim = 1;
+        }
+        write(fd, buffer, strlen(buffer));
+        n_read = read(fd, buffer, BUF_SIZE);
+        printf("%s\n", buffer);
+    }
     close(fd);
     exit(0);
 }
