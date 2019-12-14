@@ -33,6 +33,10 @@ pthread.h
 -
 dirent.h
 -
+regex.h
+-
+ctype.h
+-
 headers.h
 /home/francisco/Desktop/ProjetoIRC/headers.h
 

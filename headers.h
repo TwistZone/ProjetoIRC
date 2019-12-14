@@ -9,8 +9,10 @@ void *process_client(void *arg);
 
 void erro(char *msg);
 
-int find_empty_slot(int *array, int size);
+int find_empty_slot(const int *array, int size);
 
 void list_files(char *output);
+
+void to_lower(char *str);
 
 #endif //IRCPROJ_HEADERS_H

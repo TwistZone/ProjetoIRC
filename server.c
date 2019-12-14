@@ -11,9 +11,12 @@
 #include <sys/wait.h>
 #include <pthread.h>
 #include <dirent.h>
+#include <regex.h>
+#include <ctype.h>
 #include "headers.h"
 
 #define BUF_SIZE 1000
+#define DOWNLOAD_PATTERN "download (tcp|udp) (enc|nor) [a-zA-Z.]*"
 
 pthread_t *threads;
 int *client_fds;
@@ -86,14 +89,20 @@ void *process_client(void *arg) {
     int client_fd = *((int *) arg);
     int nread = 1;
     char buffer[BUF_SIZE];
+    regex_t regex;
+    regcomp(&regex, DOWNLOAD_PATTERN, REG_EXTENDED);
+
     while (!fim && nread > 0) {
         nread = read(client_fd, buffer, BUF_SIZE - 1);
         buffer[nread] = '\0';
         printf("%s\n", buffer);
-        if (!strcasecmp(buffer, "list")) {
+        to_lower(buffer);
+        if (!strcmp(buffer, "list")) {
             list_files(buffer);
-        } else if (!strcasecmp(buffer, "quit")) {
+        } else if (!strcmp(buffer, "quit")) {
             break;
+        } else if (!regexec(&regex, buffer, 0, NULL, 0)) {
+            strcpy(buffer, "download request");
         } else {
             strcpy(buffer, "unknown command");
         }
@@ -111,7 +120,7 @@ void erro(char *msg) {
     exit(-1);
 }
 
-int find_empty_slot(int *array, int size) {
+int find_empty_slot(const int *array, int size) {
     for (int i = 0; i < size; i++) {
         if (!array[i])
             return i;
@@ -138,4 +147,12 @@ void list_files(char *output) {
     }
 
     closedir(dr);
+}
+
+void to_lower(char *str) {
+    //source code from web
+    //https://stackoverflow.com/questions/2661766/how-do-i-lowercase-a-string-in-c
+    for (int i = 0; str[i]; i++) {
+        str[i] = (char) tolower(str[i]);
+    }
 }
