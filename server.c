@@ -61,13 +61,12 @@ int main(int argc, char *argv[]) {
         if (client > 0) {
             //find slot for client
             int slot = find_empty_slot(client_fds, max_clients);
-            //check if slot was found, send error message and close connection if not
-            if (slot == -1) {
-                write(client, "riperino", sizeof("riperino"));
-                close(client);
-            } else { //otherwise create thread to handle client
+            //check if slot was found, create thread to handle client or close connection if no slot avaiable
+            if (slot != -1) {
                 client_fds[slot] = client;
                 pthread_create(threads + slot, NULL, process_client, client_fds + slot);
+            } else {
+                close(client);
             }
         }
     }
@@ -79,7 +78,7 @@ void *process_client(void *arg) {
     int client_fd = *((int *) arg);
     int nread = 1;
     char buffer[BUF_SIZE];
-    while(!fim && nread > 0){
+    while (!fim && nread > 0) {
         nread = read(client_fd, buffer, BUF_SIZE - 1);
         buffer[nread] = '\0';
         printf("%s\n", buffer);
