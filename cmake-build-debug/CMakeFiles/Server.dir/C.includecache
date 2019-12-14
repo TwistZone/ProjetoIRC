@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/francisco/Desktop/IRCproj/server.c
+sys/socket.h
+-
+sys/types.h
+-
+netinet/in.h
+-
+unistd.h
+-
+stdlib.h
+-
+stdio.h
+-
+netdb.h
+-
+string.h
+-
+sys/types.h
+-
+sys/wait.h
+-
+pthread.h
+-
+
