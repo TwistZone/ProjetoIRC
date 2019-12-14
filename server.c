@@ -88,8 +88,11 @@ int main(int argc, char *argv[]) {
 void *process_client(void *arg) {
     int client_fd = *((int *) arg);
     int nread = 1;
-    char buffer[BUF_SIZE];
+    char buffer[BUF_SIZE], encryption[4], protocol[4], file_name[BUF_SIZE];
     regex_t regex;
+    FILE *fp;
+
+    //prepare regex to confirm correctness of download requests
     regcomp(&regex, DOWNLOAD_PATTERN, REG_EXTENDED);
 
     while (!fim && nread > 0) {
@@ -102,7 +105,16 @@ void *process_client(void *arg) {
         } else if (!strcmp(buffer, "quit")) {
             break;
         } else if (!regexec(&regex, buffer, 0, NULL, 0)) {
-            strcpy(buffer, "download request");
+            strcpy(buffer, "download request"); //TODO process options enc/protocol
+            //find file, if does not exist send error otherwise send file size and then send file
+            sscanf(buffer, "download %s %s %s", protocol, encryption, file_name);
+            fp = fopen(file_name, "r");
+            if (fp == NULL) {
+                strcpy(buffer, "requested file not available");
+            } else {
+                upload(fp, client_fd);
+            }
+
         } else {
             strcpy(buffer, "unknown command");
         }
@@ -155,4 +167,8 @@ void to_lower(char *str) {
     for (int i = 0; str[i]; i++) {
         str[i] = (char) tolower(str[i]);
     }
+}
+
+void upload(FILE *fp, int client_fd) {
+
 }
