@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named Proxy
+
+# Build rule for target.
+Proxy: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Proxy
+.PHONY : Proxy
+
+# fast build rule for target.
+Proxy/fast:
+	$(MAKE) -f CMakeFiles/Proxy.dir/build.make CMakeFiles/Proxy.dir/build
+.PHONY : Proxy/fast
+
+#=============================================================================
 # Target rules for targets named Server
 
 # Build rule for target.
@@ -163,6 +176,33 @@ client.c.s:
 	$(MAKE) -f CMakeFiles/Client.dir/build.make CMakeFiles/Client.dir/client.c.s
 .PHONY : client.c.s
 
+proxy.o: proxy.c.o
+
+.PHONY : proxy.o
+
+# target to build an object file
+proxy.c.o:
+	$(MAKE) -f CMakeFiles/Proxy.dir/build.make CMakeFiles/Proxy.dir/proxy.c.o
+.PHONY : proxy.c.o
+
+proxy.i: proxy.c.i
+
+.PHONY : proxy.i
+
+# target to preprocess a source file
+proxy.c.i:
+	$(MAKE) -f CMakeFiles/Proxy.dir/build.make CMakeFiles/Proxy.dir/proxy.c.i
+.PHONY : proxy.c.i
+
+proxy.s: proxy.c.s
+
+.PHONY : proxy.s
+
+# target to generate assembly for a file
+proxy.c.s:
+	$(MAKE) -f CMakeFiles/Proxy.dir/build.make CMakeFiles/Proxy.dir/proxy.c.s
+.PHONY : proxy.c.s
+
 server.o: server.c.o
 
 .PHONY : server.o
@@ -198,11 +238,15 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... Proxy"
 	@echo "... Server"
 	@echo "... Client"
 	@echo "... client.o"
 	@echo "... client.i"
 	@echo "... client.s"
+	@echo "... proxy.o"
+	@echo "... proxy.i"
+	@echo "... proxy.s"
 	@echo "... server.o"
 	@echo "... server.i"
 	@echo "... server.s"

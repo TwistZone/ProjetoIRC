@@ -15,7 +15,7 @@
 #include <ctype.h>
 #include "headers.h"
 
-#define BUF_SIZE 1000
+#define BUF_SIZE 1024
 #define DOWNLOAD_PATTERN "download (tcp|udp) (enc|nor) [a-zA-Z.]*"
 
 pthread_t *threads;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
 void *process_client(void *arg) {
     int client_fd = *((int *) arg);
     int nread = 1;
-    char buffer[BUF_SIZE], encryption[4], protocol[4], file_name[BUF_SIZE];
+    char buffer[BUF_SIZE], encryption[4], protocol[4], file_name[BUF_SIZE], file_path[BUF_SIZE];
     regex_t regex;
     FILE *fp;
 
@@ -105,10 +105,11 @@ void *process_client(void *arg) {
         } else if (!strcmp(buffer, "quit")) {
             break;
         } else if (!regexec(&regex, buffer, 0, NULL, 0)) {
-            strcpy(buffer, "download request"); //TODO process options enc/protocol
+            //TODO process options enc/protocol
             //find file, if does not exist send error otherwise send file size and then send file
             sscanf(buffer, "download %s %s %s", protocol, encryption, file_name);
-            fp = fopen(file_name, "r");
+            sprintf(file_path, "server_files/%s", file_name);
+            fp = fopen(file_path, "r");
             if (fp == NULL) {
                 strcpy(buffer, "requested file not available");
             } else {
@@ -170,5 +171,8 @@ void to_lower(char *str) {
 }
 
 void upload(FILE *fp, int client_fd) {
-
+    char buffer[BUF_SIZE];
+    fseek(fp, 0L, SEEK_END);
+    sprintf(buffer, "download: %ld bytes", ftell(fp));
+    write(client_fd, buffer, strlen(buffer) + 1);
 }
