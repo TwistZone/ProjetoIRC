@@ -37,6 +37,46 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="KeyGen">
+				<Option output="/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/KeyGen" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/francisco/Desktop/ProjetoIRC/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Makefile&quot;  VERBOSE=1 KeyGen"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="KeyGen/fast">
+				<Option output="/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/KeyGen" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/francisco/Desktop/ProjetoIRC/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Makefile&quot;  VERBOSE=1 KeyGen/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="Proxy">
 				<Option output="/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/Proxy" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/home/francisco/Desktop/ProjetoIRC/cmake-build-debug"/>
@@ -160,6 +200,9 @@
 		</Build>
 		<Unit filename="/home/francisco/Desktop/ProjetoIRC/client.c">
 			<Option target="Client"/>
+		</Unit>
+		<Unit filename="/home/francisco/Desktop/ProjetoIRC/cryptography.c">
+			<Option target="KeyGen"/>
 		</Unit>
 		<Unit filename="/home/francisco/Desktop/ProjetoIRC/proxy.c">
 			<Option target="Proxy"/>

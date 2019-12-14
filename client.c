@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <regex.h>
+#include <sodium.h>
 
 #define BUF_SIZE 1000
 #define DOWNLOAD_PATTERN "download file [a-zA-Z.]* with [0-9]* bytes"

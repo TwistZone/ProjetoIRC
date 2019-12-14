@@ -13,6 +13,7 @@
 #include <dirent.h>
 #include <regex.h>
 #include <ctype.h>
+#include <sodium.h>
 #include "server_headers.h"
 
 #define BUF_SIZE 1024
@@ -42,6 +43,11 @@ int main(int argc, char *argv[]) {
         printf("./Server <port> <max clients>\n");
         return 0;
     } else printf("server running on process %d\n", getpid());
+
+    if (sodium_init() < 0) {
+        printf("Sodium library failed, aborting\n");
+        exit(-1);
+    }
 
     //initialize arrays with size defined on argument
     max_clients = atoi(argv[2]);

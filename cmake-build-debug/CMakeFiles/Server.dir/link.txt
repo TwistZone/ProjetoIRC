@@ -1,1 +1,1 @@
-/usr/bin/cc -Wall -Wextra -pthread -g   CMakeFiles/Server.dir/server.c.o  -o Server 
+/usr/bin/cc -Wall -Wextra -pthread -lsodium -g   CMakeFiles/Server.dir/server.c.o  -o Server 

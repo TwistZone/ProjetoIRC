@@ -1,1 +1,1 @@
-/usr/bin/cc -Wall -Wextra -pthread -g   CMakeFiles/Proxy.dir/proxy.c.o  -o Proxy 
+/usr/bin/cc -Wall -Wextra -pthread -lsodium -g   CMakeFiles/Proxy.dir/proxy.c.o  -o Proxy 

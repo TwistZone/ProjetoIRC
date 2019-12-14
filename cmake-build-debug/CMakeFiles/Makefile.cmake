@@ -44,6 +44,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/KeyGen.dir/DependInfo.cmake"
   "CMakeFiles/Proxy.dir/DependInfo.cmake"
   "CMakeFiles/Server.dir/DependInfo.cmake"
   "CMakeFiles/Client.dir/DependInfo.cmake"

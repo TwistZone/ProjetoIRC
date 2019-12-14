@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named KeyGen
+
+# Build rule for target.
+KeyGen: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 KeyGen
+.PHONY : KeyGen
+
+# fast build rule for target.
+KeyGen/fast:
+	$(MAKE) -f CMakeFiles/KeyGen.dir/build.make CMakeFiles/KeyGen.dir/build
+.PHONY : KeyGen/fast
+
+#=============================================================================
 # Target rules for targets named Proxy
 
 # Build rule for target.
@@ -176,6 +189,33 @@ client.c.s:
 	$(MAKE) -f CMakeFiles/Client.dir/build.make CMakeFiles/Client.dir/client.c.s
 .PHONY : client.c.s
 
+cryptography.o: cryptography.c.o
+
+.PHONY : cryptography.o
+
+# target to build an object file
+cryptography.c.o:
+	$(MAKE) -f CMakeFiles/KeyGen.dir/build.make CMakeFiles/KeyGen.dir/cryptography.c.o
+.PHONY : cryptography.c.o
+
+cryptography.i: cryptography.c.i
+
+.PHONY : cryptography.i
+
+# target to preprocess a source file
+cryptography.c.i:
+	$(MAKE) -f CMakeFiles/KeyGen.dir/build.make CMakeFiles/KeyGen.dir/cryptography.c.i
+.PHONY : cryptography.c.i
+
+cryptography.s: cryptography.c.s
+
+.PHONY : cryptography.s
+
+# target to generate assembly for a file
+cryptography.c.s:
+	$(MAKE) -f CMakeFiles/KeyGen.dir/build.make CMakeFiles/KeyGen.dir/cryptography.c.s
+.PHONY : cryptography.c.s
+
 proxy.o: proxy.c.o
 
 .PHONY : proxy.o
@@ -238,12 +278,16 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... KeyGen"
 	@echo "... Proxy"
 	@echo "... Server"
 	@echo "... Client"
 	@echo "... client.o"
 	@echo "... client.i"
 	@echo "... client.s"
+	@echo "... cryptography.o"
+	@echo "... cryptography.i"
+	@echo "... cryptography.s"
 	@echo "... proxy.o"
 	@echo "... proxy.i"
 	@echo "... proxy.s"

@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -Wextra -pthread -lsodium -g   CMakeFiles/KeyGen.dir/cryptography.c.o  -o KeyGen 

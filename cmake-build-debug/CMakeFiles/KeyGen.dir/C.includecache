@@ -6,25 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/francisco/Desktop/ProjetoIRC/client.c
-stdio.h
--
-sys/types.h
--
-sys/socket.h
--
-netinet/in.h
--
-stdlib.h
+/home/francisco/Desktop/ProjetoIRC/cryptography.c
+sodium.h
 -
 string.h
--
-unistd.h
--
-netdb.h
--
-regex.h
--
-sodium.h
 -
 

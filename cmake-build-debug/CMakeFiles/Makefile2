@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = /home/francisco/Desktop/ProjetoIRC/cmake-build-debug
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/KeyGen.dir/all
 all: CMakeFiles/Proxy.dir/all
 all: CMakeFiles/Server.dir/all
 all: CMakeFiles/Client.dir/all
@@ -60,6 +61,7 @@ all: CMakeFiles/Client.dir/all
 .PHONY : all
 
 # The main recursive "clean" target.
+clean: CMakeFiles/KeyGen.dir/clean
 clean: CMakeFiles/Proxy.dir/clean
 clean: CMakeFiles/Server.dir/clean
 clean: CMakeFiles/Client.dir/clean
@@ -72,13 +74,40 @@ preinstall:
 .PHONY : preinstall
 
 #=============================================================================
+# Target rules for target CMakeFiles/KeyGen.dir
+
+# All Build rule for target.
+CMakeFiles/KeyGen.dir/all:
+	$(MAKE) -f CMakeFiles/KeyGen.dir/build.make CMakeFiles/KeyGen.dir/depend
+	$(MAKE) -f CMakeFiles/KeyGen.dir/build.make CMakeFiles/KeyGen.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles --progress-num=3,4 "Built target KeyGen"
+.PHONY : CMakeFiles/KeyGen.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/KeyGen.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/KeyGen.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles 0
+.PHONY : CMakeFiles/KeyGen.dir/rule
+
+# Convenience name for target.
+KeyGen: CMakeFiles/KeyGen.dir/rule
+
+.PHONY : KeyGen
+
+# clean rule for target.
+CMakeFiles/KeyGen.dir/clean:
+	$(MAKE) -f CMakeFiles/KeyGen.dir/build.make CMakeFiles/KeyGen.dir/clean
+.PHONY : CMakeFiles/KeyGen.dir/clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/Proxy.dir
 
 # All Build rule for target.
 CMakeFiles/Proxy.dir/all:
 	$(MAKE) -f CMakeFiles/Proxy.dir/build.make CMakeFiles/Proxy.dir/depend
 	$(MAKE) -f CMakeFiles/Proxy.dir/build.make CMakeFiles/Proxy.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles --progress-num=3,4 "Built target Proxy"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles --progress-num=5,6 "Built target Proxy"
 .PHONY : CMakeFiles/Proxy.dir/all
 
 # Build rule for subdir invocation for target.
@@ -105,7 +134,7 @@ CMakeFiles/Proxy.dir/clean:
 CMakeFiles/Server.dir/all:
 	$(MAKE) -f CMakeFiles/Server.dir/build.make CMakeFiles/Server.dir/depend
 	$(MAKE) -f CMakeFiles/Server.dir/build.make CMakeFiles/Server.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles --progress-num=5,6 "Built target Server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles --progress-num=7,8 "Built target Server"
 .PHONY : CMakeFiles/Server.dir/all
 
 # Build rule for subdir invocation for target.

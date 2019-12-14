@@ -1,1 +1,1 @@
-/usr/bin/cc -Wall -Wextra -pthread -g   CMakeFiles/Client.dir/client.c.o  -o Client 
+/usr/bin/cc -Wall -Wextra -pthread -lsodium -g   CMakeFiles/Client.dir/client.c.o  -o Client 
