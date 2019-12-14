@@ -10,6 +10,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <pthread.h>
+#include <dirent.h>
+#include "headers.h"
 
 #define BUF_SIZE 1000
 
@@ -17,11 +19,7 @@ pthread_t *threads;
 int *client_fds;
 char fim;
 
-void *process_client(void *arg);
 
-void erro(char *msg);
-
-int find_empty_slot(int *array, int size);
 
 int main(int argc, char *argv[]) {
     int fd, client;
@@ -83,11 +81,12 @@ void *process_client(void *arg) {
         buffer[nread] = '\0';
         printf("%s\n", buffer);
         if (!strcasecmp(buffer, "list")) {
-            strcpy(buffer, "lista");
+            list_files(buffer);
         } else {
             strcpy(buffer, "unknown command");
         }
-        write(client_fd, buffer, strlen(buffer));
+        printf("responding with %lu bytes\n", strlen(buffer) + 1);
+        write(client_fd, buffer, strlen(buffer) + 1);
     }
     close(client_fd);
     //free client slot
@@ -106,4 +105,25 @@ int find_empty_slot(int *array, int size) {
             return i;
     }
     return -1;
+}
+
+void list_files(char *output) {
+    //based on source code from web
+    //https://www.geeksforgeeks.org/c-program-list-files-sub-directories-directory/
+    DIR *dr = opendir("server_files");
+    struct dirent *de;
+    if (dr == NULL)  // opendir returns NULL if couldn't open directory
+    {
+        strcpy(output, "Could not open the directory");
+        return;
+    }
+    *output = 0; //initialize string to concatenate over
+    while ((de = readdir(dr)) != NULL) {
+        if (strcmp(de->d_name, ".") != 0 && strcmp(de->d_name, "..")) {
+            strcat(output, de->d_name);
+            strcat(output, "\n");
+        }
+    }
+
+    closedir(dr);
 }

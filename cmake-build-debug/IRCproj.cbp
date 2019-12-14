@@ -121,6 +121,9 @@
 		<Unit filename="/home/francisco/Desktop/ProjetoIRC/client.c">
 			<Option target="Client"/>
 		</Unit>
+		<Unit filename="/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/headers.h">
+			<Option target="Server"/>
+		</Unit>
 		<Unit filename="/home/francisco/Desktop/ProjetoIRC/server.c">
 			<Option target="Server"/>
 		</Unit>
