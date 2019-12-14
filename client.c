@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
     while (!fim) {
         //get user input and send to server
         fgets(buffer, BUF_SIZE, stdin);
+        buffer[strlen(buffer) - 1] = 0; //remove \n
         //in case of exit end cycle
         if (!strcasecmp(buffer, "exit")) {
             fim = 1;

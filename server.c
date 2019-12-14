@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     if (argc < 3) {
         printf("./Server <port> <max clients>\n");
         return 0;
-    }
+    } else printf("server running on process %d\n", getpid());
 
     //initialize arrays with size defined on argument
     max_clients = atoi(argv[2]);
@@ -82,6 +82,12 @@ void *process_client(void *arg) {
         nread = read(client_fd, buffer, BUF_SIZE - 1);
         buffer[nread] = '\0';
         printf("%s\n", buffer);
+        if (!strcasecmp(buffer, "list")) {
+            strcpy(buffer, "lista");
+        } else {
+            strcpy(buffer, "unknown command");
+        }
+        write(client_fd, buffer, strlen(buffer));
     }
     close(client_fd);
     //free client slot
