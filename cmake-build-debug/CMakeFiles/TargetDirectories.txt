@@ -1,4 +1,4 @@
-/home/francisco/Desktop/IRCproj/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/francisco/Desktop/IRCproj/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/francisco/Desktop/IRCproj/cmake-build-debug/CMakeFiles/Server.dir
-/home/francisco/Desktop/IRCproj/cmake-build-debug/CMakeFiles/Client.dir
+/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles/Server.dir
+/home/francisco/Desktop/ProjetoIRC/cmake-build-debug/CMakeFiles/Client.dir
