@@ -19,7 +19,14 @@ pthread_t *threads;
 int *client_fds;
 char fim;
 
-
+void *proper_termination_of_port(void *fd_pointer) {
+    //for test purposes only, should not make it to final version.
+    int fd = *((int *) fd_pointer);
+    char buffer[BUF_SIZE];
+    scanf("%s", buffer); //waits for anything
+    close(fd);
+    exit(0);
+}
 
 int main(int argc, char *argv[]) {
     int fd, client;
@@ -53,6 +60,9 @@ int main(int argc, char *argv[]) {
         erro("na funcao listen");
     client_addr_size = sizeof(client_addr);
 
+    //for test purposes only, should not make it to final version.
+    pthread_create(threads, NULL, proper_termination_of_port, &fd);
+
     //while no shutdown command is received keep waiting for clients
     while (!fim) {
         client = accept(fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_size);
@@ -68,7 +78,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-
+    close(fd);
     return 0;
 }
 
