@@ -92,6 +92,8 @@ void *process_client(void *arg) {
         printf("%s\n", buffer);
         if (!strcasecmp(buffer, "list")) {
             list_files(buffer);
+        } else if (!strcasecmp(buffer, "quit")) {
+            break;
         } else {
             strcpy(buffer, "unknown command");
         }
@@ -129,7 +131,7 @@ void list_files(char *output) {
     }
     *output = 0; //initialize string to concatenate over
     while ((de = readdir(dr)) != NULL) {
-        if (strcmp(de->d_name, ".") != 0 && strcmp(de->d_name, "..")) {
+        if (strcmp(de->d_name, ".") != 0 && strcmp(de->d_name, "..") != 0) {
             strcat(output, de->d_name);
             strcat(output, "\n");
         }

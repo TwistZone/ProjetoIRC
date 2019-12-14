@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
         fgets(buffer, BUF_SIZE, stdin);
         buffer[strlen(buffer) - 1] = 0; //remove \n
         //in case of exit end cycle
-        if (!strcasecmp(buffer, "exit")) {
+        if (!strcasecmp(buffer, "quit")) {
             fim = 1;
         }
         write(fd, buffer, strlen(buffer));
