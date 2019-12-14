@@ -6,10 +6,14 @@
 #include <string.h>
 #include <unistd.h>
 #include <netdb.h>
+#include <regex.h>
 
 #define BUF_SIZE 1000
+#define DOWNLOAD_PATTERN "download file [a-zA-Z.]* with [0-9]* bytes"
 
 void erro(char *msg);
+
+void download(int fd, char *buffer);
 
 int main(int argc, char *argv[]) {
     char endServer[BUF_SIZE];
@@ -50,10 +54,31 @@ int main(int argc, char *argv[]) {
         }
         write(fd, buffer, strlen(buffer));
         n_read = read(fd, buffer, BUF_SIZE);
+        //verify if download
+        download(fd, buffer);
         printf("%s\n", buffer);
     }
     close(fd);
     exit(0);
+}
+
+void download(int fd, char *buffer) {
+    char file_name[BUF_SIZE];
+    int total, n_read;
+    FILE *fp;
+    regex_t regex;
+    regcomp(&regex, DOWNLOAD_PATTERN, REG_EXTENDED);
+    //if download message, downloads, else does nothing and prints message on main as usual
+    if (!regexec(&regex, buffer, 0, NULL, 0)) {
+        sscanf(buffer, "download file %s with %d bytes", file_name, &total);
+        fp = fopen(file_name, "wb");
+        while (total > 0 && (n_read = recv(fd, buffer, 1024, 0)) > 0) {
+            total -= n_read;
+            fwrite(buffer, 1, n_read, fp);
+        }
+        fclose(fp);
+        strcpy(buffer, "download success");
+    }
 }
 
 void erro(char *msg) {

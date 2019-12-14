@@ -109,17 +109,16 @@ void *process_client(void *arg) {
             //find file, if does not exist send error otherwise send file size and then send file
             sscanf(buffer, "download %s %s %s", protocol, encryption, file_name);
             sprintf(file_path, "server_files/%s", file_name);
-            fp = fopen(file_path, "r");
+            fp = fopen(file_path, "rb");
             if (fp == NULL) {
                 strcpy(buffer, "requested file not available");
             } else {
-                upload(fp, client_fd);
+                upload(fp, client_fd, file_name);
             }
 
         } else {
             strcpy(buffer, "unknown command");
         }
-        printf("responding with %lu bytes\n", strlen(buffer) + 1);
         write(client_fd, buffer, strlen(buffer) + 1);
     }
     close(client_fd);
@@ -170,9 +169,16 @@ void to_lower(char *str) {
     }
 }
 
-void upload(FILE *fp, int client_fd) {
+void upload(FILE *fp, int client_fd, char *file_name) {
     char buffer[BUF_SIZE];
+    unsigned long n_read;
     fseek(fp, 0L, SEEK_END);
-    sprintf(buffer, "download: %ld bytes", ftell(fp));
+    sprintf(buffer, "download file %s with %ld bytes", file_name, ftell(fp));
+    rewind(fp);
     write(client_fd, buffer, strlen(buffer) + 1);
+    //send file
+    while ((n_read = fread(buffer, 1, sizeof(buffer), fp)) > 0) {
+        send(client_fd, buffer, n_read, 0);
+    }
+    fclose(fp);
 }
