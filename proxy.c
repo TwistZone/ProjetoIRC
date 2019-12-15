@@ -1,114 +1,195 @@
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <regex.h>
-#include <sodium.h>
+ #include <sys/socket.h>  
+ #include <sys/types.h>  
+ #include <resolv.h>  
+ #include <string.h>  
+ #include <stdlib.h>  
+ #include <pthread.h>  
+ #include<unistd.h>  
+ #include<netdb.h> //hostent  
+ #include<arpa/inet.h>  
+ #include <errno.h>
 
-#define BUF_SIZE 1024
-#define DOWNLOAD_PATTERN "download (encrypted|clear) file [a-zA-Z.]* with [0-9]* bytes"
+//Based on http://amritapnitc.blogspot.com/2015/07/simple-proxy-server-in-c-using-multi.html
+ int hostname_to_ip(char * , char *);  
+ // A structure to maintain client fd, and server ip address and port address  
+ // client will establish connection to server using given IP and port   
+ struct serverInfo  
+ {  
+      int client_fd;  
+      int server_fd;
+      char ip[100];  
+      char port[100];  
+ };  
+ // A thread function  
+   
+ void* client_to_server(void* vargp){
+       struct serverInfo *info = (struct serverInfo *)vargp;  
+        char buffer[65535];  
+        int bytes =0;
+            while(1)  
+      {  
+           //receive data from client  
+           memset(&buffer, '\0', sizeof(buffer));  
+           bytes = read(info->client_fd, buffer, sizeof(buffer));  
+           if(bytes <= 0)  
+           {  
+           }  
+           else   
+           {  
+                // send data to main server  
+                write(info->server_fd,buffer,bytes);
+                //write(server_fd, buffer, sizeof(buffer));  
+                //printf("client fd is : %d\n",c_fd);                    
+                printf("From client %d: ",info->client_fd);                    
+                fputs(buffer,stdout);  
+                printf("\n");    
+                  fflush(stdout);  
+           }  
+      }
+ }
 
-void erro(char *msg);
 
-void download(int fd, char *buffer);
 
-int main(int argc, char *argv[]) {
-    char endServer[BUF_SIZE];
-    char buffer[BUF_SIZE];
-    int fd;
-    int fim = 0, n_read;
-    struct sockaddr_in addr;
-    struct hostent *hostPtr;
-
-    if (argc < 6) {
-        printf("Client <proxy ip> <server ip> <proxy port> <server port> <protocol>\n");
-        return -1;
-    }
-    //must run with 6 arguments however proxy and protocol arguments are ignored in the current version
-    //gets name of end server
-    strcpy(endServer, argv[2]);
-    if ((hostPtr = gethostbyname(endServer)) == 0)
-        erro("Nao consegui obter endereço");
-
-    //sets up required struct to connect to server
-    bzero((void *) &addr, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = ((struct in_addr *) (hostPtr->h_addr))->s_addr;
-    addr.sin_port = htons((short) atoi(argv[4]));
-
-    //sets up socket and tries connection
-    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-        erro("socket");
-    if (connect(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0)
-        erro("Connect");
-    while (!fim) {
-        //get user input and send to server
-        fgets(buffer, BUF_SIZE, stdin);
-        buffer[strlen(buffer) - 1] = 0; //remove \n
-        //in case of exit end cycle
-        if (!strcasecmp(buffer, "quit")) {
-            fim = 1;
-        }
-        write(fd, buffer, strlen(buffer));
-        n_read = read(fd, buffer, BUF_SIZE);
-        //verify if download
-        download(fd, buffer);
-        printf("%s\n", buffer);
-    }
-    close(fd);
-    exit(0);
-}
-
-void download(int fd, char *buffer) {
-    char file_name[BUF_SIZE];
-    unsigned char key[crypto_secretbox_KEYBYTES];
-    unsigned char nonce[crypto_secretbox_NONCEBYTES];
-    unsigned char encrypted[BUF_SIZE];
-    unsigned char string[BUF_SIZE];
-    int total, n_read;
-    FILE *fp;
-    regex_t regex;
-    regcomp(&regex, DOWNLOAD_PATTERN, REG_EXTENDED);
-    //if download message, downloads, else does nothing and prints message on main as usual
-    if (!regexec(&regex, buffer, 0, NULL, 0)) {
-        if (strstr(buffer, "encrypted")) {
-            sscanf(buffer, "download encrypted file %s with %d bytes", file_name, &total);
-            //get nonce
-            recv(fd, nonce, crypto_secretbox_NONCEBYTES, 0);
-            //load PSK
-            fp = fopen("PSK", "rb");
-            fread(key, 1, crypto_secretbox_KEYBYTES, fp);
-            fclose(fp);
-        } else {
-            sscanf(buffer, "download clear file %s with %d bytes", file_name, &total);
-        }
-        fp = fopen(file_name, "wb");
-        int extra = strstr(buffer, "encrypted") != NULL ? crypto_secretbox_MACBYTES : 0;
-        while (total > 0 && (n_read = recv(fd, encrypted, BUF_SIZE < total + crypto_secretbox_MACBYTES ? BUF_SIZE : total + extra, 0)) > 0) {
-            total -= n_read - extra;
-            if (strstr(buffer, "encrypted")) {
-                int erro = crypto_secretbox_open_easy(string, encrypted, n_read, nonce, key);
-                if (erro) {
-                    printf("erro\n");
-                    fclose(fp);
-                    return;
-                } else printf("all good:. remaining: %d\n", total);
-                fwrite(string, 1, n_read - crypto_secretbox_MACBYTES, fp);
-            } else {
-                fwrite(encrypted, 1, n_read, fp);
-            }
-        }
-        fclose(fp);
-        strcpy(buffer, "download success");
-    }
-    n_read = read(fd, buffer, BUF_SIZE);//read rest of input
-}
-
-void erro(char *msg) {
-    printf("Erro: %s\n", msg);
-    exit(-1);
-}
+// A thread for each client request
+ void *runSocket(void *vargp)  
+ {  
+   struct serverInfo *info = (struct serverInfo *)vargp;  
+   char buffer[65535];  
+   int bytes =0;  
+      printf("client:%d\n",info->client_fd);  
+      printf("%s\n",info->ip);
+      printf("%s\n",info->port); 
+      //code to connect to main server via this proxy server  
+      int server_fd =0;  
+      struct sockaddr_in server_sd;  
+      // create a socket  
+      info->server_fd = socket(AF_INET, SOCK_STREAM, 0);  
+      if(server_fd < 0)  
+      {  
+           printf("server socket not created\n");  
+      }  
+      printf("server socket created\n");       
+      memset(&server_sd, 0, sizeof(server_sd));  
+      // set socket variables  
+      server_sd.sin_family = AF_INET;  
+      server_sd.sin_port = htons(atoi(info->port));  
+      server_sd.sin_addr.s_addr = inet_addr(info->ip);  
+      //connect to main server from this proxy server  
+      for(int i=1;i<11;i++){
+           printf("Trying to connect to server...\n");
+           printf("Try %d\n",i);
+          if((connect(info->server_fd, (struct sockaddr *)&server_sd, sizeof(server_sd)))<0)  {
+               fprintf(stderr,"Error: &d\n",errno);
+               perror("Error printed by perror");
+               printf("server connection not established\n");  
+               if(i==10){
+                    printf("Couldn't connect to server...\n");
+                    printf("Exiting...\n");
+                    exit(0);
+               }
+          }
+          else{
+                 printf("server socket connected\n"); 
+                 break;
+          }
+          sleep(1);
+      }
+          pthread_t client_thread;
+          pthread_create(&client_thread,0,client_to_server,(void*) info);
+           //recieve response from server  
+           while(1){
+           memset(&buffer, '\0', sizeof(buffer));  
+           bytes = read(info->server_fd, buffer, sizeof(buffer));  
+           if(bytes <= 0)  
+           {  
+           }            
+           else  
+           {  
+                // send response back to client  
+                write(info->client_fd, buffer,sizeof(buffer));  
+                printf("From server : ");                    
+                fputs(buffer,stdout);   
+                printf("\n");         
+           }  
+      };       
+   return NULL;  
+ }  
+ // main entry point  
+ int main(int argc,char *argv[])  
+ {  
+     pthread_t tid;  
+     char port[100],ip[100];  
+     char *hostname = argv[1];  
+     char proxy_port[100];  
+        // accept arguments from terminal  
+        strcpy(ip,argv[1]); // server ip  
+        strcpy(port,argv[2]);  // server port  
+        strcpy(proxy_port,argv[3]); // proxy port  
+        //hostname_to_ip(hostname , ip);  
+        printf("server IP : %s and port %s \n" , ip,port);   
+        printf("proxy port is %s \n",proxy_port);        
+      //socket variables  
+      int proxy_fd =0, client_fd=0;  
+      struct sockaddr_in proxy_sd;  
+ // add this line only if server exits when client exits  
+ //signal(SIGPIPE,SIG_IGN);  
+      // create a socket  
+      if((proxy_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)  
+      {  
+          printf("\nFailed to create socket\n");  
+      }  
+      printf("Proxy created\n");  
+      memset(&proxy_sd, 0, sizeof(proxy_sd));  
+      // set socket variables  
+      proxy_sd.sin_family = AF_INET;  
+      proxy_sd.sin_port = htons(atoi(proxy_port));  
+      proxy_sd.sin_addr.s_addr = INADDR_ANY;  
+      // bind the socket  
+      if((bind(proxy_fd, (struct sockaddr*)&proxy_sd,sizeof(proxy_sd))) < 0)  
+      {  
+           printf("Failed to bind a socket\n");  
+      }  
+      // start listening to the port for new connections  
+      if((listen(proxy_fd, SOMAXCONN)) < 0)  
+      {  
+           printf("Failed to listen\n");  
+      }  
+      printf("waiting for connection..\n");  
+      //accept all client connections continuously  
+      while(1)  
+      {  
+           client_fd = accept(proxy_fd, (struct sockaddr*)NULL ,NULL);  
+           printf("client no. %d connected\n",client_fd);  
+           if(client_fd > 0)  
+           {  
+                 //multithreading variables      
+                 struct serverInfo *item = malloc(sizeof(struct serverInfo));  
+                 item->client_fd = client_fd;  
+                 strcpy(item->ip,ip);  
+                 strcpy(item->port,port);  
+                 pthread_create(&tid, NULL, runSocket, (void *)item);  
+                 sleep(1);  
+           }  
+      }  
+      return 0;  
+ }  
+ int hostname_to_ip(char * hostname , char* ip)  
+ {  
+   struct hostent *he;  
+   struct in_addr **addr_list;  
+   int i;  
+   if ( (he = gethostbyname( hostname ) ) == NULL)   
+   {  
+     // get the host info  
+     herror("gethostbyname");  
+     return 1;  
+   }  
+   addr_list = (struct in_addr **) he->h_addr_list;  
+   for(i = 0; addr_list[i] != NULL; i++)   
+   {  
+     //Return the first one;  
+     strcpy(ip , inet_ntoa(*addr_list[i]) );  
+     return 0;  
+   }  
+   return 1;  
+ }  
