@@ -178,6 +178,7 @@ void to_lower(char *str) {
 void upload(FILE *fp, int client_fd, char *file_name, int encryption) {
     FILE *key_file;
     char buffer[BUF_SIZE];
+    int extra = 0;
     unsigned char encrypted[BUF_SIZE];
     unsigned char file_buffer[BUF_SIZE];
     unsigned char key[crypto_secretbox_KEYBYTES];
@@ -185,6 +186,7 @@ void upload(FILE *fp, int client_fd, char *file_name, int encryption) {
     unsigned long n_read;
     fseek(fp, 0L, SEEK_END);
     if (encryption) {
+        extra = crypto_secretbox_MACBYTES;
         //generate nonce and load key
         randombytes_buf(nonce, crypto_secretbox_NONCEBYTES);
         key_file = fopen("PSK", "rb");
@@ -192,7 +194,7 @@ void upload(FILE *fp, int client_fd, char *file_name, int encryption) {
         fclose(key_file);
         sprintf(buffer, "download encrypted file %s with %ld bytes", file_name, ftell(fp));
     } else {
-        sprintf(buffer, "download clear file %s with %ld bytes", file_name, ftell(fp));
+        sprintf(buffer, "download clear file %s with %lu bytes", file_name, ftell(fp));
     }
     rewind(fp);
     write(client_fd, buffer, strlen(buffer) + 1);
@@ -201,12 +203,13 @@ void upload(FILE *fp, int client_fd, char *file_name, int encryption) {
         send(client_fd, nonce, crypto_secretbox_NONCEBYTES, 0);
 
     //send file
-    while ((n_read = fread(file_buffer, 1, BUF_SIZE - crypto_secretbox_MACBYTES, fp)) > 0) {
+    while ((n_read = fread(file_buffer, 1, BUF_SIZE - extra, fp)) > 0) {
         if (encryption) {
             crypto_secretbox_easy(encrypted, file_buffer, n_read, nonce, key);
-            send(client_fd, encrypted, n_read + crypto_secretbox_MACBYTES, 0);
+            send(client_fd, encrypted, n_read + extra, 0);
         } else {
             send(client_fd, file_buffer, n_read, 0);
+            printf("sending: %d bytes\n", n_read);
         }
     }
     fclose(fp);

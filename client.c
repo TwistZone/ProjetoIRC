@@ -88,7 +88,7 @@ void download(int fd, char *buffer) {
         }
         fp = fopen(file_name, "wb");
         int extra = strstr(buffer, "encrypted") != NULL ? crypto_secretbox_MACBYTES : 0;
-        while (total > 0 && (n_read = recv(fd, encrypted, BUF_SIZE < total + crypto_secretbox_MACBYTES ? BUF_SIZE : total + extra, 0)) > 0) {
+        while (total > 0 && (n_read = recv(fd, encrypted, BUF_SIZE < total + extra ? BUF_SIZE : total + extra, 0)) > 0) {
             total -= n_read - extra;
             if (strstr(buffer, "encrypted")) {
                 int erro = crypto_secretbox_open_easy(string, encrypted, n_read, nonce, key);
@@ -100,12 +100,13 @@ void download(int fd, char *buffer) {
                 fwrite(string, 1, n_read - crypto_secretbox_MACBYTES, fp);
             } else {
                 fwrite(encrypted, 1, n_read, fp);
+                printf("all good:. remaining: %d\n", total);
             }
         }
         fclose(fp);
-        strcpy(buffer, "download success");
+        printf("download success\n");
+        n_read = read(fd, buffer, BUF_SIZE);//read rest of input
     }
-    n_read = read(fd, buffer, BUF_SIZE);//read rest of input
 }
 
 void erro(char *msg) {
