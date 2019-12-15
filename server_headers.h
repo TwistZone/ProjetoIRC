@@ -15,6 +15,6 @@ void list_files(char *output);
 
 void to_lower(char *str);
 
-void upload(FILE *fp, int client_fd, char *file_name);
+void upload(FILE *fp, int client_fd, char *file_name, int encryption);
 
 #endif //IRCPROJ_SERVER_HEADERS_H

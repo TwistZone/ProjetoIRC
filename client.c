@@ -9,8 +9,8 @@
 #include <regex.h>
 #include <sodium.h>
 
-#define BUF_SIZE 1000
-#define DOWNLOAD_PATTERN "download file [a-zA-Z.]* with [0-9]* bytes"
+#define BUF_SIZE 1024
+#define DOWNLOAD_PATTERN "download (encrypted|clear) file [a-zA-Z.]* with [0-9]* bytes"
 
 void erro(char *msg);
 
@@ -65,21 +65,48 @@ int main(int argc, char *argv[]) {
 
 void download(int fd, char *buffer) {
     char file_name[BUF_SIZE];
+    unsigned char key[crypto_secretbox_KEYBYTES];
+    unsigned char nonce[crypto_secretbox_NONCEBYTES];
+    unsigned char encrypted[BUF_SIZE];
+    unsigned char string[BUF_SIZE];
     int total, n_read;
     FILE *fp;
     regex_t regex;
     regcomp(&regex, DOWNLOAD_PATTERN, REG_EXTENDED);
     //if download message, downloads, else does nothing and prints message on main as usual
     if (!regexec(&regex, buffer, 0, NULL, 0)) {
-        sscanf(buffer, "download file %s with %d bytes", file_name, &total);
+        if (strstr(buffer, "encrypted")) {
+            sscanf(buffer, "download encrypted file %s with %d bytes", file_name, &total);
+            //get nonce
+            recv(fd, nonce, crypto_secretbox_NONCEBYTES, 0);
+            //load PSK
+            fp = fopen("PSK", "rb");
+            fread(key, 1, crypto_secretbox_KEYBYTES, fp);
+            fclose(fp);
+        } else {
+            sscanf(buffer, "download clear file %s with %d bytes", file_name, &total);
+        }
+
         fp = fopen(file_name, "wb");
-        while (total > 0 && (n_read = recv(fd, buffer, 1024, 0)) > 0) {
-            total -= n_read;
-            fwrite(buffer, 1, n_read, fp);
+        int extra = strstr(buffer, "encrypted") != NULL ? crypto_secretbox_MACBYTES : 0;
+        while (total > 0 && (n_read = recv(fd, encrypted, BUF_SIZE < total + crypto_secretbox_MACBYTES ? BUF_SIZE : total + extra, 0)) > 0) {
+            total -= n_read - extra;
+            if (strstr(buffer, "encrypted")) {
+                int erro = crypto_secretbox_open_easy(string, encrypted, n_read, nonce, key);
+                if (erro) {
+                    printf("erro\n");
+                    fclose(fp);
+                    return;
+                } else printf("all good:. remaining: %d\n", total);
+                fwrite(string, 1, n_read - crypto_secretbox_MACBYTES, fp);
+            } else {
+                fwrite(encrypted, 1, n_read, fp);
+            }
         }
         fclose(fp);
         strcpy(buffer, "download success");
     }
+    n_read = read(fd, buffer, BUF_SIZE);//read rest of input
 }
 
 void erro(char *msg) {

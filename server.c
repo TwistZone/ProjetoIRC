@@ -111,7 +111,7 @@ void *process_client(void *arg) {
         } else if (!strcmp(buffer, "quit")) {
             break;
         } else if (!regexec(&regex, buffer, 0, NULL, 0)) {
-            //TODO process options enc/protocol
+            //TODO process protocol option
             //find file, if does not exist send error otherwise send file size and then send file
             sscanf(buffer, "download %s %s %s", protocol, encryption, file_name);
             sprintf(file_path, "server_files/%s", file_name);
@@ -119,9 +119,9 @@ void *process_client(void *arg) {
             if (fp == NULL) {
                 strcpy(buffer, "requested file not available");
             } else {
-                upload(fp, client_fd, file_name);
+                upload(fp, client_fd, file_name, strcmp(encryption, "nor"));
+                strcpy(buffer, "requested file sent");
             }
-
         } else {
             strcpy(buffer, "unknown command");
         }
@@ -175,16 +175,39 @@ void to_lower(char *str) {
     }
 }
 
-void upload(FILE *fp, int client_fd, char *file_name) {
+void upload(FILE *fp, int client_fd, char *file_name, int encryption) {
+    FILE *key_file;
     char buffer[BUF_SIZE];
+    unsigned char encrypted[BUF_SIZE];
+    unsigned char file_buffer[BUF_SIZE];
+    unsigned char key[crypto_secretbox_KEYBYTES];
+    unsigned char nonce[crypto_secretbox_NONCEBYTES];
     unsigned long n_read;
     fseek(fp, 0L, SEEK_END);
-    sprintf(buffer, "download file %s with %ld bytes", file_name, ftell(fp));
+    if (encryption) {
+        //generate nonce and load key
+        randombytes_buf(nonce, crypto_secretbox_NONCEBYTES);
+        key_file = fopen("PSK", "rb");
+        fread(key, 1, crypto_secretbox_KEYBYTES, key_file);
+        fclose(key_file);
+        sprintf(buffer, "download encrypted file %s with %ld bytes", file_name, ftell(fp));
+    } else {
+        sprintf(buffer, "download clear file %s with %ld bytes", file_name, ftell(fp));
+    }
     rewind(fp);
     write(client_fd, buffer, strlen(buffer) + 1);
+    //send nonce
+    if (encryption)
+        send(client_fd, nonce, crypto_secretbox_NONCEBYTES, 0);
+
     //send file
-    while ((n_read = fread(buffer, 1, sizeof(buffer), fp)) > 0) {
-        send(client_fd, buffer, n_read, 0);
+    while ((n_read = fread(file_buffer, 1, BUF_SIZE - crypto_secretbox_MACBYTES, fp)) > 0) {
+        if (encryption) {
+            crypto_secretbox_easy(encrypted, file_buffer, n_read, nonce, key);
+            send(client_fd, encrypted, n_read + crypto_secretbox_MACBYTES, 0);
+        } else {
+            send(client_fd, file_buffer, n_read, 0);
+        }
     }
     fclose(fp);
 }

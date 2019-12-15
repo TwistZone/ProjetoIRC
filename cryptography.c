@@ -8,7 +8,7 @@
 int main() {
     //working example
     //Must assume all parties have the key, so we share it through a file PSK
-    //Must send over the encrypted content, the nonce and the encrypted content size
+    //Must send over the encrypted content, the nonce and the encrypted content's size
 
     unsigned char key[crypto_secretbox_KEYBYTES];
     FILE *fp;
@@ -41,13 +41,13 @@ int main() {
     unsigned char encrypted[1000];
 
     printf("original:\n%s\n", string);
-    int a = (int) strlen(string);
+    int original_size = (int) strlen(string);
     //encrypt
-    crypto_secretbox_easy(encrypted, string, a, nonce, key);
+    crypto_secretbox_easy(encrypted, string, original_size, nonce, key);
     printf("encriptada:\n%s\n", encrypted);
     *string = 0;
     //decrypt
-    crypto_secretbox_open_easy(string, encrypted, crypto_secretbox_MACBYTES + a, nonce, key);
+    int erro = crypto_secretbox_open_easy(string, encrypted, crypto_secretbox_MACBYTES + original_size, nonce, key);
     printf("desencriptada:\n%s\n", string);
     return 0;
 }
