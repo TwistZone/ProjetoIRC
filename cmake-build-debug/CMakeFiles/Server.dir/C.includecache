@@ -6,37 +6,3 @@
 
 #IncludeRegexTransform: 
 
-/home/francisco/Desktop/ProjetoIRC/headers.h
-
-/home/francisco/Desktop/ProjetoIRC/server.c
-sys/socket.h
--
-sys/types.h
--
-netinet/in.h
--
-unistd.h
--
-stdlib.h
--
-stdio.h
--
-netdb.h
--
-string.h
--
-sys/types.h
--
-sys/wait.h
--
-pthread.h
--
-dirent.h
--
-regex.h
--
-ctype.h
--
-headers.h
-/home/francisco/Desktop/ProjetoIRC/headers.h
-

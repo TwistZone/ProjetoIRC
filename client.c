@@ -86,7 +86,6 @@ void download(int fd, char *buffer) {
         } else {
             sscanf(buffer, "download clear file %s with %d bytes", file_name, &total);
         }
-
         fp = fopen(file_name, "wb");
         int extra = strstr(buffer, "encrypted") != NULL ? crypto_secretbox_MACBYTES : 0;
         while (total > 0 && (n_read = recv(fd, encrypted, BUF_SIZE < total + crypto_secretbox_MACBYTES ? BUF_SIZE : total + extra, 0)) > 0) {
