@@ -10,7 +10,6 @@
  #include <errno.h>
 
 //Based on http://amritapnitc.blogspot.com/2015/07/simple-proxy-server-in-c-using-multi.html
-
  int hostname_to_ip(char * , char *);  
  // A structure to maintain client fd, and server ip address and port address  
  // client will establish connection to server using given IP and port   
@@ -79,8 +78,9 @@
                 // send data to main server  
                 write(server_fd, buffer, sizeof(buffer));  
                 //printf("client fd is : %d\n",c_fd);                    
-                printf("From client :\n");                    
-                fputs(buffer,stdout);       
+                printf("From client %d: ",info->client_fd);                    
+                fputs(buffer,stdout);  
+                printf("\n");    
                   fflush(stdout);  
            }  
            //recieve response from server  
@@ -93,8 +93,9 @@
            {  
                 // send response back to client  
                 write(info->client_fd, buffer, sizeof(buffer));  
-                printf("From server :\n");                    
-                fputs(buffer,stdout);            
+                printf("From server : ");                    
+                fputs(buffer,stdout);   
+                printf("\n");         
            }  
       };       
    return NULL;  
