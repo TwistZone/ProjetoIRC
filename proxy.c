@@ -2,12 +2,18 @@
 #include <sys/types.h>
 #include <resolv.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include<unistd.h>
 #include<netdb.h> //hostent
 #include<arpa/inet.h>
 #include <errno.h>
+#include <stdbool.h>
+
+#define BUF_SIZE 65535
+
+bool fim = false;
 
 //Based on http://amritapnitc.blogspot.com/2015/07/simple-proxy-server-in-c-using-multi.html
 int hostname_to_ip(char *, char *);
@@ -24,7 +30,7 @@ struct serverInfo {
 
 void *client_to_server(void *vargp) {
     struct serverInfo *info = (struct serverInfo *) vargp;
-    char buffer[65535];
+    char buffer[BUF_SIZE];
     int bytes = 0;
     do {
         //receive data from client
@@ -35,14 +41,14 @@ void *client_to_server(void *vargp) {
             write(info->server_fd, buffer, bytes);
             printf("From client %d: %s\n", info->client_fd, buffer);
         }
-    } while (bytes > 0);
+    } while (bytes > 0 && fim == false);
 }
 
 
 // A thread for each client request
 void *runSocket(void *vargp) {
     struct serverInfo *info = (struct serverInfo *) vargp;
-    char buffer[65535];
+    char buffer[BUF_SIZE];
     int bytes = 0;
     printf("client:%d\n", info->client_fd);
     printf("%s\n", info->ip);
@@ -91,8 +97,21 @@ void *runSocket(void *vargp) {
             write(info->client_fd, buffer, bytes);
             printf("From server: %s\n", buffer);
         }
-    } while (bytes > 0);
+    } while (bytes > 0 && fim == false);
     return NULL;
+}
+
+void *command(void *vargp) {
+    char buffer[BUF_SIZE];
+    while (!fim) {
+        fgets(buffer, BUF_SIZE, stdin);
+        buffer[strlen(buffer) - 1] = 0;
+        if (!strcasecmp(buffer, "quit")) {
+            printf("%s\n", buffer);
+            fim = true;
+            exit(1);
+        }
+    }
 }
 
 // main entry point
@@ -101,6 +120,7 @@ int main(int argc, char *argv[]) {
     char port[100], ip[100];
     char *hostname = argv[1];
     char proxy_port[100];
+    pthread_t command_thread;
     // accept arguments from terminal
     strcpy(ip, argv[1]); // server ip
     strcpy(port, argv[2]);  // server port
@@ -113,6 +133,7 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in proxy_sd;
     // add this line only if server exits when client exits
     //signal(SIGPIPE,SIG_IGN);
+    pthread_create(&command_thread, 0, command, NULL);
     // create a socket
     if ((proxy_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\nFailed to create socket\n");
@@ -133,7 +154,7 @@ int main(int argc, char *argv[]) {
     }
     printf("waiting for connection..\n");
     //accept all client connections continuously
-    while (1) {
+    while (fim == false) {
         client_fd = accept(proxy_fd, (struct sockaddr *) NULL, NULL);
         printf("client no. %d connected\n", client_fd);
         if (client_fd > 0) {

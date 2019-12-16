@@ -16,6 +16,8 @@ void erro(char *msg);
 
 void download_tcp(int fd, char *buffer);
 
+void download_udp(int fd, char *buffer);
+
 int main(int argc, char *argv[]) {
     char endServer[BUF_SIZE];
     char buffer[BUF_SIZE];
@@ -65,12 +67,16 @@ int main(int argc, char *argv[]) {
         } else if (strstr(buffer, "download udp")) {
             n_read = read(fd, buffer, BUF_SIZE);
             //verify if download
-            download_tcp(fd, buffer);
+            download_udp(fd, buffer);
         } else n_read = read(fd, buffer, BUF_SIZE);
         printf("%s\n", buffer);
     }
     close(fd);
     exit(0);
+}
+
+void download_udp(int fd, char *buffer) {
+    printf("placeholder: %s\n", buffer);
 }
 
 void download_tcp(int fd, char *buffer) {

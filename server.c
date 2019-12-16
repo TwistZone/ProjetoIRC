@@ -108,7 +108,11 @@ void *process_client(void *arg) {
             if (fp == NULL) {
                 strcpy(buffer, "requested file not available");
             } else {
-                upload_tcp(fp, client_fd, file_name, strcmp(encryption, "nor"));
+                if (!strcmp(protocol, "tcp")) {
+                    upload_tcp(fp, client_fd, file_name, strcmp(encryption, "nor"));
+                } else {
+                    upload_udp(fp, client_fd, file_name, strcmp(encryption, "nor"));
+                }
                 strcpy(buffer, "requested file sent");
             }
         } else {
@@ -201,4 +205,8 @@ void upload_tcp(FILE *fp, int client_fd, char *file_name, int encryption) {
         }
     }
     fclose(fp);
+}
+
+void upload_udp(FILE *fp, int client_fd, char *file_name, int encryption) {
+    printf("place holder for udp request\n");
 }

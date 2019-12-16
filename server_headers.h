@@ -17,4 +17,6 @@ void to_lower(char *str);
 
 void upload_tcp(FILE *fp, int client_fd, char *file_name, int encryption);
 
+void upload_udp(FILE *fp, int client_fd, char *file_name, int encryption);
+
 #endif //IRCPROJ_SERVER_HEADERS_H
