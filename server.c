@@ -181,7 +181,7 @@ void upload_tcp(FILE *fp, int client_fd, char *file_name, int encryption) {
         key_file = fopen("PSK", "rb");
         fread(key, 1, crypto_secretbox_KEYBYTES, key_file);
         fclose(key_file);
-        sprintf(buffer, "download encrypted file %s with %ld bytes", file_name, ftell(fp));
+        sprintf(buffer, "download encrypted file %s with %lu bytes", file_name, ftell(fp));
     } else {
         sprintf(buffer, "download clear file %s with %lu bytes", file_name, ftell(fp));
     }

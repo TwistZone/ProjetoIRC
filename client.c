@@ -10,7 +10,7 @@
 #include <sodium.h>
 
 #define BUF_SIZE 1024
-#define DOWNLOAD_PATTERN "downloadtcp (encrypted|clear) file [a-zA-Z.]* with [0-9]* bytes"
+#define DOWNLOAD_PATTERN "download (encrypted|clear) file [a-zA-Z.]* with [0-9]* bytes"
 
 void erro(char *msg);
 
