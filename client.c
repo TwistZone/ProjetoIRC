@@ -10,17 +10,18 @@
 #include <sodium.h>
 
 #define BUF_SIZE 1024
-#define DOWNLOAD_PATTERN "download (encrypted|clear) file [a-zA-Z.]* with [0-9]* bytes"
+#define DOWNLOAD_PATTERN "downloadtcp (encrypted|clear) file [a-zA-Z.]* with [0-9]* bytes"
 
 void erro(char *msg);
 
-void download(int fd, char *buffer);
+void download_tcp(int fd, char *buffer);
 
 int main(int argc, char *argv[]) {
     char endServer[BUF_SIZE];
     char buffer[BUF_SIZE];
     int fd;
-    int fim = 0, n_read;
+    char fim = 0;
+    int n_read;
     struct sockaddr_in addr;
     struct hostent *hostPtr;
 
@@ -51,19 +52,28 @@ int main(int argc, char *argv[]) {
         buffer[strlen(buffer) - 1] = 0; //remove \n
         //in case of exit end cycle
         if (!strcasecmp(buffer, "quit")) {
+            write(fd, buffer, strlen(buffer));
             fim = 1;
+            sleep(1);
+            exit(0);
         }
         write(fd, buffer, strlen(buffer));
-        n_read = read(fd, buffer, BUF_SIZE);
-        //verify if download
-        download(fd, buffer);
+        if (strstr(buffer, "download tcp")) {
+            n_read = read(fd, buffer, BUF_SIZE);
+            //verify if download
+            download_tcp(fd, buffer);
+        } else if (strstr(buffer, "download udp")) {
+            n_read = read(fd, buffer, BUF_SIZE);
+            //verify if download
+            download_tcp(fd, buffer);
+        } else n_read = read(fd, buffer, BUF_SIZE);
         printf("%s\n", buffer);
     }
     close(fd);
     exit(0);
 }
 
-void download(int fd, char *buffer) {
+void download_tcp(int fd, char *buffer) {
     char file_name[BUF_SIZE];
     unsigned char key[crypto_secretbox_KEYBYTES];
     unsigned char nonce[crypto_secretbox_NONCEBYTES];

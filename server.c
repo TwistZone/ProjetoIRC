@@ -23,14 +23,6 @@ pthread_t *threads;
 int *client_fds;
 char fim;
 
-void *proper_termination_of_port(void *fd_pointer) {
-    //for test purposes only, should not make it to final version.
-    int fd = *((int *) fd_pointer);
-    char buffer[BUF_SIZE];
-    scanf("%s", buffer); //waits for anything
-    close(fd);
-    exit(0);
-}
 
 int main(int argc, char *argv[]) {
     int fd, client;
@@ -68,9 +60,6 @@ int main(int argc, char *argv[]) {
     if (listen(fd, 5) < 0)
         erro("na funcao listen");
     client_addr_size = sizeof(client_addr);
-
-    //for test purposes only, should not make it to final version.
-    pthread_create(threads, NULL, proper_termination_of_port, &fd);
 
     //while no shutdown command is received keep waiting for clients
     while (!fim) {
@@ -119,7 +108,7 @@ void *process_client(void *arg) {
             if (fp == NULL) {
                 strcpy(buffer, "requested file not available");
             } else {
-                upload(fp, client_fd, file_name, strcmp(encryption, "nor"));
+                upload_tcp(fp, client_fd, file_name, strcmp(encryption, "nor"));
                 strcpy(buffer, "requested file sent");
             }
         } else {
@@ -175,7 +164,7 @@ void to_lower(char *str) {
     }
 }
 
-void upload(FILE *fp, int client_fd, char *file_name, int encryption) {
+void upload_tcp(FILE *fp, int client_fd, char *file_name, int encryption) {
     FILE *key_file;
     char buffer[BUF_SIZE];
     int extra = 0;
