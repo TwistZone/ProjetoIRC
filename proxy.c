@@ -80,7 +80,7 @@
            printf("Try %d\n",i);
           if((connect(info->server_fd, (struct sockaddr *)&server_sd, sizeof(server_sd)))<0)  {
                fprintf(stderr,"Error: &d\n",errno);
-               perror("Error printed by perror");
+               perror("Error");
                printf("server connection not established\n");  
                if(i==10){
                     printf("Couldn't connect to server...\n");
@@ -100,11 +100,7 @@
            while(1){
            memset(&buffer, '\0', sizeof(buffer));  
            bytes = read(info->server_fd, buffer, sizeof(buffer));  
-           if(bytes <= 0)  
-           {  
-           }            
-           else  
-           {  
+           if(bytes > 0)  {  
                 // send response back to client  
                 write(info->client_fd, buffer,sizeof(buffer));  
                 printf("From server : ");                    
