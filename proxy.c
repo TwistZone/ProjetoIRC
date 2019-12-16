@@ -26,22 +26,16 @@ void *client_to_server(void *vargp) {
     struct serverInfo *info = (struct serverInfo *) vargp;
     char buffer[65535];
     int bytes = 0;
-    while (1) {
+    do {
         //receive data from client
         memset(&buffer, '\0', sizeof(buffer));
         bytes = read(info->client_fd, buffer, sizeof(buffer));
-        if (bytes <= 0) {
-        } else {
+        if (bytes > 0) {
             // send data to main server
             write(info->server_fd, buffer, bytes);
-            //write(server_fd, buffer, sizeof(buffer));
-            //printf("client fd is : %d\n",c_fd);
-            printf("From client %d: ", info->client_fd);
-            fputs(buffer, stdout);
-            printf("\n");
-            fflush(stdout);
+            printf("From client %d: %s\n", info->client_fd, buffer);
         }
-    }
+    } while (bytes > 0);
 }
 
 
@@ -72,7 +66,7 @@ void *runSocket(void *vargp) {
         printf("Trying to connect to server...\n");
         printf("Try %d\n", i);
         if ((connect(info->server_fd, (struct sockaddr *) &server_sd, sizeof(server_sd))) < 0) {
-            fprintf(stderr, "Error: &d\n", errno);
+            fprintf(stderr, "Error: %d\n", errno);
             perror("Error");
             printf("server connection not established\n");
             if (i == 10) {
@@ -89,17 +83,15 @@ void *runSocket(void *vargp) {
     pthread_t client_thread;
     pthread_create(&client_thread, 0, client_to_server, (void *) info);
     //recieve response from server
-    while (1) {
+    do {
         memset(&buffer, '\0', sizeof(buffer));
         bytes = read(info->server_fd, buffer, sizeof(buffer));
         if (bytes > 0) {
             // send response back to client
-            write(info->client_fd, buffer, sizeof(buffer));
-            printf("From server : ");
-            fputs(buffer, stdout);
-            printf("\n");
+            write(info->client_fd, buffer, bytes);
+            printf("From server: %s\n", buffer);
         }
-    };
+    } while (bytes > 0);
     return NULL;
 }
 
