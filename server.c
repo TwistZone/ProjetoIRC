@@ -209,7 +209,6 @@ void upload(FILE *fp, int client_fd, char *file_name, int encryption) {
             send(client_fd, encrypted, n_read + extra, 0);
         } else {
             send(client_fd, file_buffer, n_read, 0);
-            printf("sending: %d bytes\n", n_read);
         }
     }
     fclose(fp);

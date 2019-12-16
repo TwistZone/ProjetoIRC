@@ -25,4 +25,6 @@ netdb.h
 -
 arpa/inet.h
 -
+errno.h
+-
 

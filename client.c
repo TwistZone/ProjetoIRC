@@ -96,11 +96,10 @@ void download(int fd, char *buffer) {
                     printf("erro\n");
                     fclose(fp);
                     return;
-                } else printf("all good:. remaining: %d\n", total);
+                }
                 fwrite(string, 1, n_read - crypto_secretbox_MACBYTES, fp);
             } else {
                 fwrite(encrypted, 1, n_read, fp);
-                printf("all good:. remaining: %d\n", total);
             }
         }
         fclose(fp);
